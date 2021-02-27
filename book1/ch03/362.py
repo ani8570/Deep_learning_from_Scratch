@@ -1,6 +1,5 @@
-from func import Softmax
-from func  import Sigmoid
-import tensorflow as tf
+from func import *
+from mnist import load_mnist
 import numpy as np
 import pickle
 from PIL import Image
@@ -10,11 +9,7 @@ def img_show(img):
     pil_img.show()
     
 def get_data():
-    mnist = tf.keras.datasets.mnist
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    
-    print(x_test.shape)
-
+    (x_train, y_train), (x_test, y_test) = load_mnist(flatten=True, normalize=False, one_hot_label=False)
     return x_test, y_test
 
 def init_network():
@@ -44,5 +39,16 @@ for i in range(len(x)):
     p = np.argmax(y)
     if p == t[i]:
         accuracy_cnt +=1
+
+print("Accuracy: " + str(float(accuracy_cnt) / len(x)))
+
+
+batch_size = 100
+accuracy_cnt = 0
+for i in range(0, len(x), batch_size):
+    x_batch = x[i:i+batch_size]
+    y_batch = predict(network, x_batch)
+    p = np.argmax(y_batch, axis=1)
+    accuracy_cnt += np.sum(p == t[i:i+batch_size])
 
 print("Accuracy: " + str(float(accuracy_cnt) / len(x)))
